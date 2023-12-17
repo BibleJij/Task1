@@ -12,6 +12,5 @@ public class Main {
         userDaoJDBC.removeUserById(1);
         System.out.println(userDaoJDBC.getAllUsers());
         userDaoJDBC.dropUsersTable();
-
     }
 }

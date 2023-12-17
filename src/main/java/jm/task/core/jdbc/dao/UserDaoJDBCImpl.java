@@ -10,6 +10,7 @@ import java.util.List;
 public class UserDaoJDBCImpl implements UserDao {
 
     private final Util util;
+
     public UserDaoJDBCImpl() {
         this.util = new Util();
     }
@@ -54,8 +55,9 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         String delete = "DELETE FROM users.User WHERE id = ?";
         try (Connection connection = util.getConnectionJDBC();
-             PreparedStatement preparedStatement = connection.prepareStatement(delete)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(delete)) {
             preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -68,13 +70,12 @@ public class UserDaoJDBCImpl implements UserDao {
              PreparedStatement preparedStatement = connection.prepareStatement(select);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                User user = new User(
+                userList.add(new User(
                         resultSet.getLong("id"),
                         resultSet.getString("name"),
                         resultSet.getString("lastName"),
                         resultSet.getByte("age")
-                );
-                userList.add(user);
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -83,7 +84,7 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        String delete = "DELETE * FROM users.user";
+        String delete = "DELETE FROM users.user";
         try (Connection connection = util.getConnectionJDBC()){
             Statement statement = connection.createStatement();
             statement.execute(delete);
